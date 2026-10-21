@@ -3,100 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ยินดีต้อนรับสู่เว็บไซต์ของฉัน</title>
+    <title>โปรเจกต์ 3D แรกของฉัน 🎲</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
         body {
-            font-family: sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            margin: 0;
+            overflow: hidden; /* ซ่อนสกรอลล์บาร์ */
+            background-color: #000;
         }
-        .card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 450px;
+        #info {
+            position: absolute;
+            top: 20px;
             width: 100%;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-        .profile-img {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            background-color: #38bdf8;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            color: #f3f4f6;
-        }
-        .bio {
-            color: #94a3b8;
-            font-size: 14px;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-        .section-title {
-            font-size: 16px;
-            color: #38bdf8;
-            margin-bottom: 12px;
-            text-align: left;
-        }
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .link-btn {
-            display: block;
-            padding: 12px;
-            background-color: #334155;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-        .link-btn:hover {
-            background-color: #38bdf8;
-            color: #0f172a;
+            color: white;
+            font-family: sans-serif;
+            font-size: 18px;
+            pointer-events: none;
         }
     </style>
+    <!-- ดึง Three.js มาใช้งานผ่าน CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
 
-    <div class="card">
-        <!-- รูปโปรไฟล์ (ใส่อิโมจิหรือเปลี่ยนเป็นรูปภาพได้) -->
-        <div class="profile-img">👨‍💻</div>
-        
-        <!-- ชื่อและคำอธิบายสั้นๆ -->
-        <h1>ยินดีต้อนรับครับ!</h1>
-        <p class="bio">พื้นที่เก็บผลงานและเรื่องราวส่วนตัวของผม ยินดีที่ได้รู้จักทุกคนครับ 🚀</p>
+    <div id="info">🎲 กล่อง 3D หมุนได้ตัวแรกบนหน้าเว็บ!</div>
 
-        <!-- ช่องทางติดต่อ / ผลงาน -->
-        <div class="section-title">📌 ช่องทางการติดตาม & ผลงาน</div>
-        <div class="links">
-            <a href="https://facebook.com" target="_blank" class="link-btn">Facebook</a>
-            <a href="https://github.com" target="_blank" class="link-btn">GitHub ของฉัน</a>
-            <a href="mailto:example@email.com" class="link-btn">ส่งอีเมลหาผม</a>
-        </div>
-    </div>
+    <script>
+        // 1. สร้าง ฉาก (Scene), กล้อง (Camera) และ ตัววาดภาพ (Renderer)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // 2. สร้างวัตถุ 3D (รูปทรง + พื้นผิว/สี)
+        const geometry = new THREE.BoxGeometry(2, 2, 2); // รูปทรงลูกบาศก์ขนาด 2x2x2
+        const material = new THREE.MeshStandardMaterial({ color: 0x00ff88, roughness: 0.3 }); // สีเขียวนีออนสะท้อนแสง
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // 3. ใส่แสงสว่างลงในฉาก (ถ้าไม่มีแสง วัตถุจะมืดมองไม่เห็น)
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 5, 5).normalize();
+        scene.add(light);
+
+        const ambientLight = new THREE.AmbientLight(0x404040); // แสงสว่างรอบๆ
+        scene.add(ambientLight);
+
+        // วางตำแหน่งกล้องถอยออกมาให้มองเห็นกล่อง
+        camera.position.z = 5;
+
+        // 4. แอนิเมชันสั่งให้กล่องหมุนตลอดเวลาแบบเรียลไทม์
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // ปรับมุมหมุนทีละนิด
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // ปรับขนาดหน้าจออัตโนมัติเมื่อย่อ/ขยายเบราว์เซอร์
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
 
 </body>
 </html>
